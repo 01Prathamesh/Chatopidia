@@ -35,7 +35,7 @@ def handle_message(data):
     sender = data.get('sender', 'Anonymous')
 
     # Debugging print statement
-    print(f"Received message: {message} from {sender}")
+    print(f"Received message: {message} : From-> {sender}")
 
     # Save message to the database
     try:
