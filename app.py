@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS  # Import CORS
 import psycopg2
-from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import os
 
@@ -9,7 +9,11 @@ import os
 load_dotenv()
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+
+# Enable CORS for all origins (for testing purposes, you can refine this later)
+CORS(app)
+
+socketio = SocketIO(app, cors_allowed_origins="*")  # Allow connections from all origins
 
 # Database connection setup using environment variables
 def get_db_connection():
@@ -30,15 +34,23 @@ def handle_message(data):
     message = data['message']
     sender = data.get('sender', 'Anonymous')
 
-    # Save message to the database
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO messages (message, sender) VALUES (%s, %s)", (message, sender))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    # Debugging print statement
+    print(f"Received message: {message} from {sender}")
 
-    # Emit the message to all clients
+    # Save message to the database
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO messages (message, sender) VALUES (%s, %s)", (message, sender))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        print("Message saved to the database!")
+    except Exception as e:
+        print(f"Database error: {e}")
+
+    # Emit the message to all connected clients
     emit('receive_message', {'message': message, 'sender': sender}, broadcast=True)
 
 if __name__ == '__main__':
