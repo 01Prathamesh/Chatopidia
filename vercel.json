@@ -1,28 +1,26 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "app.py",            
-        "use": "@vercel/python"
-      },
-      {
-        "src": "static/styles.css", 
-        "use": "@vercel/static"
-      },
-      {
-        "src": "static/script.js", 
-        "use": "@vercel/static"
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "pythonVersion": "3.12"
       }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/templates/index.html"
-      },
-      {
-        "src": "/api/(.*)",
-        "dest": "/app.py"
-      }
-    ]
-  }
-  
+    },
+    {
+      "src": "static/styles.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "static/script.js",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/app.py"
+    }
+  ]
+}
