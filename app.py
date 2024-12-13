@@ -1,29 +1,19 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
-from flask_cors import CORS  # Import CORS
-import psycopg2
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
 
-# Enable CORS for all origins (for testing purposes, you can refine this later)
+# Enable CORS for all origins
 CORS(app)
 
-socketio = SocketIO(app, cors_allowed_origins="*")  # Allow connections from all origins
-
-# Database connection setup using environment variables
-def get_db_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD')
-    )
-    return conn
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/')
 def index():
@@ -33,25 +23,30 @@ def index():
 def handle_message(data):
     message = data['message']
     sender = data.get('sender', 'Anonymous')
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    # Debugging print statement
-    print(f"Received message: {message} : From-> {sender}")
+    # Remove database-related code to prevent saving messages
+    # No database interaction, just broadcasting the message to other clients.
+    
+    print(f"Message from {sender}: {message} ->at {timestamp}")  # Debugging output
 
-    # Save message to the database
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO messages (message, sender) VALUES (%s, %s)", (message, sender))
-        conn.commit()
-        cursor.close()
-        conn.close()
+    # Emit the message with timestamp to all connected clients
+    emit('receive_message', {'message': message, 'sender': sender, 'timestamp': timestamp}, broadcast=True)
 
-        print("Message saved to the database!")
-    except Exception as e:
-        print(f"Database error: {e}")
+@socketio.on('user_typing')
+def handle_typing(data):
+    sender = data.get('sender')
+    emit('typing', {'sender': sender}, broadcast=True)
 
-    # Emit the message to all connected clients
-    emit('receive_message', {'message': message, 'sender': sender}, broadcast=True)
+@socketio.on('user_joined')
+def handle_user_joined(data):
+    username = data.get('username')
+    emit('user_joined', {'username': username}, broadcast=True)
+
+@socketio.on('user_left')
+def handle_user_left(data):
+    username = data.get('username')
+    emit('user_left', {'username': username}, broadcast=True)
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
