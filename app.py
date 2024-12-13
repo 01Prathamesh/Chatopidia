@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template 
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -15,8 +15,8 @@ app = Flask(__name__)
 # Enable CORS for all origins
 CORS(app)
 
-# Initialize SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Initialize SocketIO with ping options for better connection stability
+socketio = SocketIO(app, cors_allowed_origins="*", ping_interval=10, ping_timeout=60)
 
 # Setup logging
 logging.basicConfig(level=logging.DEBUG)
