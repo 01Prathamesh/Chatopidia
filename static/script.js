@@ -12,6 +12,7 @@ const leaveChatButton = document.getElementById('leaveChatButton');
 
 let username = 'Anonymous';
 let darkMode = false;
+let typingTimeout;
 
 // Handle setting username
 setNameButton.addEventListener('click', () => {
@@ -41,9 +42,12 @@ sendButton.addEventListener('click', () => {
     }
 });
 
-// Typing indicator
+// Typing indicator with debounce
 messageInput.addEventListener('input', () => {
-    socket.emit('user_typing', { sender: username });
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        socket.emit('user_typing', { sender: username });
+    }, 500); // Emit after 500ms of inactivity (adjust as needed)
 });
 
 // Leave Chat
@@ -67,7 +71,7 @@ socket.on('typing', function(data) {
     typingIndicator.textContent = `${data.sender} is typing...`;
     setTimeout(() => {
         typingIndicator.textContent = '';
-    }, 2000);
+    }, 2000); // Clear after 2 seconds
 });
 
 // Listen for user join notification
