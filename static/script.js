@@ -1,4 +1,4 @@
-const socket = io.connect('https://chatopidia.vercel.app');
+const socket = io.connect(window.location.origin, { transports: ['websocket'] });  // Enforce WebSocket transport
 const usernameInput = document.getElementById('username');
 const setNameButton = document.getElementById('setNameButton');
 const messageInput = document.getElementById('messageInput');
@@ -47,7 +47,7 @@ messageInput.addEventListener('input', () => {
     clearTimeout(typingTimeout);
     typingTimeout = setTimeout(() => {
         socket.emit('user_typing', { sender: username });
-    }, 500); // Emit after 500ms of inactivity (adjust as needed)
+    }, 500); // Emit after 500ms of inactivity
 });
 
 // Leave Chat
@@ -90,4 +90,16 @@ socket.on('user_left', function(data) {
     leaveMessage.classList.add('join-leave-message');
     messagesDiv.appendChild(leaveMessage);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+// Handle socket connection error
+socket.on('connect_error', (error) => {
+    console.log('Connection failed: ', error);
+    alert('Connection to server failed. Please try again later.');
+});
+
+// Handle disconnection and auto-reconnect
+socket.on('disconnect', () => {
+    console.log('Disconnected. Trying to reconnect...');
+    socket.connect(); // Reconnect automatically
 });
