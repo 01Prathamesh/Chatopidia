@@ -3,28 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Chatopidia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
-        <h2>Chat App</h2>
+        <h2>Chatopidia</h2>
 
         <!-- User name input section -->
-        <div id="nameInputSection">
+        <div id="nameInputSection" class="input-section">
             <input type="text" id="username" placeholder="Enter your name" />
             <button id="setNameButton">Set Name</button>
         </div>
+
+        <!-- Typing Indicator -->
+        <div id="typingIndicator" class="typing-indicator"></div>
 
         <!-- Chat messages section -->
         <div class="messages" id="messages"></div>
 
         <!-- Message input section -->
-        <div id="messageSection" style="display: none;">
+        <div id="messageSection" class="input-section" style="display: none;">
             <input type="text" id="messageInput" placeholder="Type a message" />
-            <button id="sendButton">Send</button>
+            <div class="buttons">
+                <button id="leaveChatButton">Leave Chat</button>
+                <button id="sendButton">Send</button>
+            </div>
         </div>
+
+        <!-- Dark Mode Toggle -->
+        <button id="toggleDarkMode" class="toggle-button">🌙 Toggle Dark Mode</button>
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
