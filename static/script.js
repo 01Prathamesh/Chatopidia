@@ -1,4 +1,4 @@
-const socket = io.connect(window.location.origin, { transports: ['websocket', 'polling'] });  // Allow both WebSocket and polling
+const socket = io.connect('https://chatopidia.vercel.app', { transports: ['websocket', 'polling'] });
 const usernameInput = document.getElementById('username');
 const setNameButton = document.getElementById('setNameButton');
 const messageInput = document.getElementById('messageInput');
