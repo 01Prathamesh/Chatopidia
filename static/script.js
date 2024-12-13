@@ -1,4 +1,4 @@
-const socket = io.connect('http://localhost:5000');
+const socket = io.connect('https://chatopidia.vercel.app');
 const usernameInput = document.getElementById('username');
 const setNameButton = document.getElementById('setNameButton');
 const messageInput = document.getElementById('messageInput');
