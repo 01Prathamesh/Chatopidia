@@ -1,4 +1,4 @@
-const socket = io.connect(window.location.origin, { transports: ['websocket'] });  // Enforce WebSocket transport
+const socket = io.connect(window.location.origin, { transports: ['websocket', 'polling'] });  // Allow both WebSocket and polling
 const usernameInput = document.getElementById('username');
 const setNameButton = document.getElementById('setNameButton');
 const messageInput = document.getElementById('messageInput');
@@ -13,6 +13,8 @@ const leaveChatButton = document.getElementById('leaveChatButton');
 let username = 'Anonymous';
 let darkMode = false;
 let typingTimeout;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
 
 // Handle setting username
 setNameButton.addEventListener('click', () => {
@@ -95,11 +97,23 @@ socket.on('user_left', function(data) {
 // Handle socket connection error
 socket.on('connect_error', (error) => {
     console.log('Connection failed: ', error);
-    alert('Connection to server failed. Please try again later.');
+    alert('Connection to server failed. Trying again...');
+    
+    // Retry after a delay
+    setTimeout(() => {
+        socket.connect();
+    }, 2000);
 });
 
-// Handle disconnection and auto-reconnect
+// Handle disconnection and auto-reconnect with attempts
 socket.on('disconnect', () => {
     console.log('Disconnected. Trying to reconnect...');
-    socket.connect(); // Reconnect automatically
+    if (reconnectAttempts < maxReconnectAttempts) {
+        reconnectAttempts++;
+        setTimeout(() => {
+            socket.connect(); // Reconnect automatically after delay
+        }, 2000);
+    } else {
+        alert('Failed to reconnect after multiple attempts.');
+    }
 });
