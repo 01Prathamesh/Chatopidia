@@ -223,3 +223,34 @@ button:active {
 #leaveChatButton:active {
     background-color: #bd2130;
 }
+
+/* Emoji Picker Styles */
+.emoji-picker-container {
+    position: relative;
+    margin-bottom: 10px;
+    z-index: 2;
+}
+
+emoji-picker {
+    width: 100%;
+    max-width: 350px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chat-container {
+        padding: 15px;
+    }
+
+    input[type="text"] {
+        font-size: 1em;
+        padding: 12px;
+    }
+
+    button {
+        font-size: 1em;
+        padding: 12px;
+    }
+}
