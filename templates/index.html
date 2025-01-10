@@ -6,6 +6,7 @@
     <title>Chatopidia</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/emoji-picker-element/1.5.0/index.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
@@ -25,6 +26,9 @@
 
         <!-- Message input section -->
         <div id="messageSection" class="input-section" style="display: none;">
+            <div class="emoji-picker-container">
+                <emoji-picker></emoji-picker>
+            </div>
             <input type="text" id="messageInput" placeholder="Type a message" />
             <div class="buttons">
                 <button id="leaveChatButton">Leave Chat</button>
