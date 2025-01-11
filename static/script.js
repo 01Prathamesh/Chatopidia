@@ -11,18 +11,23 @@ const toggleDarkModeButton = document.getElementById('toggleDarkMode');
 const leaveChatButton = document.getElementById('leaveChatButton');
 const emojiPicker = document.querySelector('emoji-picker');  // Emoji picker
 
-let username = 'Anonymous';
-let darkMode = false;
+let username = localStorage.getItem('username') || 'Anonymous';  // Get saved username or default to 'Anonymous'
+let darkMode = localStorage.getItem('darkMode') === 'enabled';  // Check for dark mode status in local storage
+
+// Set the initial username and dark mode state
+if (darkMode) document.body.classList.add('dark-mode');
+usernameInput.value = username;
 
 // Handle setting username
 setNameButton.addEventListener('click', () => {
     const name = usernameInput.value.trim();
-    if (name) {
+    if (name && name !== username) {
         username = name;
+        localStorage.setItem('username', username);  // Save the username in local storage
         nameInputSection.style.display = 'none';
         messageSection.style.display = 'block';
         socket.emit('user_joined', { username });
-    } else {
+    } else if (!name) {
         alert('Please enter a valid name.');
     }
 });
@@ -31,6 +36,7 @@ setNameButton.addEventListener('click', () => {
 toggleDarkModeButton.addEventListener('click', () => {
     darkMode = !darkMode;
     document.body.classList.toggle('dark-mode', darkMode);
+    localStorage.setItem('darkMode', darkMode ? 'enabled' : 'disabled');
 });
 
 // Send message
@@ -53,6 +59,7 @@ leaveChatButton.addEventListener('click', () => {
     nameInputSection.style.display = 'block';
     messageSection.style.display = 'none';
     username = 'Anonymous';  // Reset username after leaving
+    localStorage.removeItem('username');  // Remove username from local storage
 });
 
 // Emoji Picker Integration
@@ -66,9 +73,10 @@ emojiPicker.addEventListener('emoji-click', (event) => {
 socket.on('receive_message', function(data) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message');
+    const timestamp = new Date(data.timestamp).toLocaleTimeString();
     messageElement.innerHTML = `
         <span class="sender">${data.sender}</span>: ${data.message}
-        <span class="timestamp">[${data.timestamp}]</span>
+        <span class="timestamp">[${timestamp}]</span>
     `;
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -77,7 +85,8 @@ socket.on('receive_message', function(data) {
 // Listen for typing indicator
 socket.on('typing', function(data) {
     typingIndicator.textContent = `${data.sender} is typing...`;
-    setTimeout(() => {
+    clearTimeout(typingIndicator.timeout);
+    typingIndicator.timeout = setTimeout(() => {
         typingIndicator.textContent = '';
     }, 2000);
 });
@@ -98,4 +107,9 @@ socket.on('user_left', function(data) {
     leaveMessage.classList.add('join-leave-message');
     messagesDiv.appendChild(leaveMessage);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+});
+
+// Socket.io Error Handling
+socket.on('connect_error', () => {
+    alert('Connection to the server failed. Please try again later.');
 });
