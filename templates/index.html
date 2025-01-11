@@ -14,7 +14,7 @@
 
         <!-- User name input section -->
         <div id="nameInputSection" class="input-section">
-            <input type="text" id="username" placeholder="Enter your name" />
+            <input type="text" id="username" placeholder="Enter your name" value="" />
             <button id="setNameButton">Set Name</button>
         </div>
 
@@ -41,5 +41,39 @@
     </div>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check local storage for saved user name
+            const savedUsername = localStorage.getItem('username');
+            if (savedUsername) {
+                document.getElementById('username').value = savedUsername;
+                document.getElementById('setNameButton').click();
+            }
+
+            // Dark Mode Toggle functionality
+            const toggleDarkModeButton = document.getElementById('toggleDarkMode');
+            toggleDarkModeButton.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled');
+            });
+
+            // Check local storage for dark mode setting
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+            }
+
+            // Scroll to the bottom when a new message is added
+            const messagesContainer = document.getElementById('messages');
+            const addMessage = (message) => {
+                const messageElement = document.createElement('div');
+                messageElement.textContent = message;
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+
+            // Dummy example for adding messages (to be replaced with socket communication)
+            addMessage('Hello, welcome to Chatopidia!');
+        });
+    </script>
 </body>
 </html>
